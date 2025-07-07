@@ -11,8 +11,53 @@ from utils.checked import check_ident
 router = APIRouter()
 
 @router.get('/')
-def get_orders(db: Session = Depends(database)):
-    return db.query(Orders).all()
+def get_orders(ident:int = None, db: Session = Depends(database)):
+    if ident:
+        orders = db.query(Orders).filter(Orders.id == ident).first()
+
+        all_orders_response = []
+
+        order_items = db.query(OrderItems).filter(OrderItems.order_id == orders.id).all()
+
+        all_orders_response.append({
+            "order_id": orders.id,
+            "order_date": orders.order_date,
+            "total_price": orders.total_price,
+            "items": [
+                {
+                    "book_id": item.book_id,
+                    "quantity": item.quantity,
+                    "total_price": item.total_price
+                }
+                for item in order_items
+            ]
+        })
+
+        return all_orders_response
+    else:
+        orders = db.query(Orders).all()
+
+        all_orders_response = []
+
+        for order in orders:
+            order_items = db.query(OrderItems).filter(OrderItems.order_id == order.id).all()
+
+            all_orders_response.append({
+                "order_id": order.id,
+                "order_date": order.order_date,
+                "total_price": order.total_price,
+                "items": [
+                    {
+                        "book_id": item.book_id,
+                        "quantity": item.quantity,
+                        "total_price": item.total_price
+                    }
+                    for item in order_items
+                ]
+            })
+
+        return all_orders_response
+
 
 @router.post('/')
 def create_order(form: SchemaOrder, db: Session = Depends(database)):
