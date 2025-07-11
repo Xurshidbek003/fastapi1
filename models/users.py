@@ -1,13 +1,12 @@
-from sqlalchemy import Column, String, Integer
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, String, Integer, Date
 from db import Base
 
 class Users(Base):
 
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(20), nullable=False)
-    phone = Column(String(20), nullable=False)
-    address = Column(String(50), nullable=False)
+    full_name = Column(String(50), nullable=False)
+    username = Column(String(100), nullable=False)
+    password = Column(String(255), nullable=False)
+    birth_date = Column(Date, nullable=False)
 
-    # order = relationship("Orders", back_populates='user')
